@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Satisfacción - OTIS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+   
+</head>
+<body>
+
+    <div class="container mt-5 text-center">
+        <!-- Logos en los extremos -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <img src="logo-izquierdo.png" alt="Logo Izquierdo" class="logo">
+            <img src="logo-derecho.png" alt="Logo Derecho" class="logo">
+        </div>
+
+        <!-- Contenedor de bienvenida -->
+        <div id="welcome-container" class="card p-4 shadow-lg text-center">
+            <h2 class="fw-bold text-secondary">Encuesta de Satisfacción - OTIS</h2>
+            <p>
+                Agradecemos su cooperación en esta breve encuesta de satisfacción sobre nuestros servicios en OTIS.
+                Sus respuestas nos ayudarán a mejorar continuamente nuestra atención y calidad. 
+                Puede revisar nuestro aviso de privacidad en 
+                <a href="https://www.otis.com/es/co/politica-de-privacidad/" target="_blank">https://www.otis.com/es/co/politica-de-privacidad/</a>.
+            </p>
+            <button id="accept-btn" class="btn btn-success mt-3">Aceptar</button>
+        </div>
+
+        <!-- Formulario de encuesta (Oculto al inicio) -->
+        <form id="survey-form" style="display: none;">
+            <div id="questions-container"></div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="prev-btn" class="btn btn-secondary" disabled>Atrás</button>
+                <button type="button" id="next-btn" class="btn btn-primary">Siguiente</button>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn btn-success mt-3 w-100" style="display: none;">Enviar Respuestas</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
