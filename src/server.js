@@ -1,7 +1,14 @@
 const fs = require("fs");
 
 function logErrorToFile(error) {
-    const logFilePath = path.join(__dirname, "../logs/error.log");
+    const logDir = path.join(__dirname, "../logs");
+    const logFilePath = path.join(logDir, "error.log");
+
+    // Verifica si la carpeta de logs existe, si no, la crea
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+    }
+
     const errorMessage = `${new Date().toISOString()} - ${error}\n`;
     fs.appendFileSync(logFilePath, errorMessage);
 }
@@ -89,10 +96,14 @@ process.on("unhandledRejection", (reason, promise) => {
 
 // 📌 Iniciar el servidor
 // Definir el puerto (Usa el puerto que Plesk asigna)
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-    console.log('🚀 Servidor corriendo en el puerto ${PORT}');
-
-   
-});
+const PORT = process.env.PORT || 0; // Permitir que Plesk asigne el puerto dinámicamente
+poolPromise
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error("❌ No se pudo conectar a SQL Server, deteniendo el servidor:", err);
+    });
 
