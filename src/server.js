@@ -36,6 +36,13 @@ const poolPromise = new sql.ConnectionPool(config)
 
 module.exports = { sql, poolPromise };
 
+    // 📌 Middleware para registrar todas las solicitudes entrantes
+app.use((req, res, next) => {
+    console.log(`🔍 Nueva solicitud: ${req.method} ${req.url}`);
+    next();
+});
+
+
 // 📌 Importar y usar rutas
 const routes = require("./routes");
 app.use("/api", routes);
