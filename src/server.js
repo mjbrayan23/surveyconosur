@@ -99,6 +99,9 @@ process.on("unhandledRejection", (reason, promise) => {
 const PORT = process.env.PORT || 0; // Permitir que Plesk asigne el puerto dinámicamente
 poolPromise
     .then(() => {
+        
+        console.log(`🌍 Modo: ${process.env.NODE_ENV || "development"}`);
+        console.log(`🔍 Puerto asignado: ${PORT}`);
         app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
         });
