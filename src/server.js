@@ -45,10 +45,18 @@ app.get("/encuesta", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
+// 📌 Middleware para capturar errores globales en la API
+app.use((err, req, res, next) => {
+    console.error("🔥 Error detectado:", err);
+    res.status(500).json({ error: "Error interno en el servidor", details: err.message });
+});
+
 // 📌 Iniciar el servidor
 // Definir el puerto (Usa el puerto que Plesk asigna)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+
+   
 });
 
