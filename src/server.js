@@ -1,26 +1,15 @@
 const fs = require("fs");
+const logFilePath = path.join(__dirname, "../logs/error.log");
 
 function logErrorToFile(error) {
-    const logDir = path.join(__dirname, "../logs");
-    const logFilePath = path.join(logDir, "error.log");
-
-    // Verifica si la carpeta de logs existe, si no, la crea
-    if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-    }
-
-    const errorMessage = `${new Date().toISOString()} - ${error}\n`;
+    const errorMessage = `${new Date().toISOString()} - ${error.stack || error}\n`;
     fs.appendFileSync(logFilePath, errorMessage);
 }
 
-process.on("uncaughtException", (error) => {
-    console.error("❌ Error no capturado:", error);
-    logErrorToFile(error);
-});
-
-process.on("unhandledRejection", (error) => {
-    console.error("❌ Promesa rechazada sin capturar:", error);
-    logErrorToFile(error);
+app.use((err, req, res, next) => {
+    console.error("🔥 Error detectado:", err);
+    logErrorToFile(err);
+    res.status(500).json({ error: "Error interno en el servidor", detalles: err.message });
 });
 
 
