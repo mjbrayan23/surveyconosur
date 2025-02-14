@@ -1,8 +1,8 @@
 const fs = require("fs");
-const path = require("path"); // 📌 Mueve la importación aquí, antes de usarlo
+const path = require("path"); // 📌 Asegúrate de que solo esté aquí
 
 function logErrorToFile(error) {
-    const logFilePath = path.join(__dirname, "../logs/error.log"); // 📌 Ahora `path` está definido antes
+    const logFilePath = path.join(__dirname, "../logs/error.log"); // 📌 Ahora `path` está definido antes de usarse
     const errorMessage = `${new Date().toISOString()} - ${error}\n`;
     fs.appendFileSync(logFilePath, errorMessage);
 }
@@ -11,12 +11,6 @@ process.on("uncaughtException", (error) => {
     console.error("❌ Error no capturado:", error);
     logErrorToFile(error);
 });
-
-process.on("unhandledRejection", (error) => {
-    console.error("❌ Promesa rechazada sin capturar:", error);
-    logErrorToFile(error);
-});
-
 
 
 const express = require("express");
