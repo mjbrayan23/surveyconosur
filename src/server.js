@@ -1,15 +1,7 @@
 const fs = require("fs");
-const path = require("path");
-
-// 📌 Ruta correcta para logs en Plesk
-const logFilePath = path.join(__dirname, "../logs/error.log");
-
-// 📌 Asegurar que el directorio de logs existe
-if (!fs.existsSync(path.dirname(logFilePath))) {
-    fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
-}
 
 function logErrorToFile(error) {
+    const logFilePath = path.join(__dirname, "../logs/error.log");
     const errorMessage = `${new Date().toISOString()} - ${error}\n`;
     fs.appendFileSync(logFilePath, errorMessage);
 }
@@ -24,8 +16,11 @@ process.on("unhandledRejection", (error) => {
     logErrorToFile(error);
 });
 
+
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+const path = require("path");
 const sql = require("mssql");
 require("dotenv").config();
 
@@ -35,7 +30,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 📌 Servir archivos estáticos correctamente
+// 📌 Servir archivos estáticos correctamente desde la carpeta "public"
 app.use(express.static(path.join(__dirname, "../public")));
 
 // 📌 Configuración de la base de datos
@@ -56,16 +51,16 @@ const poolPromise = new sql.ConnectionPool(config)
     })
     .catch(err => {
         console.error("❌ Error conectando a SQL Server:", err);
-        logErrorToFile(err);
     });
 
 module.exports = { sql, poolPromise };
 
-// 📌 Middleware para registrar todas las solicitudes entrantes
+    // 📌 Middleware para registrar todas las solicitudes entrantes
 app.use((req, res, next) => {
     console.log(`🔍 Nueva solicitud: ${req.method} ${req.url}`);
     next();
 });
+
 
 // 📌 Importar y usar rutas
 const routes = require("./routes");
@@ -79,23 +74,25 @@ app.get("/encuesta", (req, res) => {
 // 📌 Middleware para capturar errores globales en la API
 app.use((err, req, res, next) => {
     console.error("🔥 Error detectado:", err);
-    logErrorToFile(err);
     res.status(500).json({ error: "Error interno en el servidor", details: err.message });
 });
 
-// 📌 Problemas globales
+//Problemas globales
 process.on("uncaughtException", (err) => {
     console.error("❌ Uncaught Exception:", err);
-    logErrorToFile(err);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
     console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
-    logErrorToFile(reason);
 });
 
-// 📌 Iniciar el servidor con puerto dinámico para Plesk
-const PORT = process.env.PORT || 0;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+
+// 📌 Iniciar el servidor
+// Definir el puerto (Usa el puerto que Plesk asigna)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+    console.log('🚀 Servidor corriendo en el puerto ${PORT}');
+
+   
 });
+
