@@ -51,6 +51,16 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Error interno en el servidor", details: err.message });
 });
 
+//Problemas globales
+process.on("uncaughtException", (err) => {
+    console.error("❌ Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+
 // 📌 Iniciar el servidor
 // Definir el puerto (Usa el puerto que Plesk asigna)
 const PORT = process.env.PORT || 3000;
@@ -60,3 +70,9 @@ app.listen(PORT, "0.0.0.0", () => {
    
 });
 
+const http = require("http");
+const server = http.createServer(app);
+
+server.listen(process.env.PORT || 3000, () => {
+    console.log(`🚀 Servidor corriendo en el puerto ${process.env.PORT || 3000}`);
+});
