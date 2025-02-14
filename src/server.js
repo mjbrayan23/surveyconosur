@@ -1,3 +1,23 @@
+
+const fs = require("fs");
+
+function logErrorToFile(error) {
+    const logFilePath = "/surveyotis.rpa.lat/logs/error.log";
+    const errorMessage = `${new Date().toISOString()} - ${error}\n`;
+    fs.appendFileSync(logFilePath, errorMessage);
+}
+
+process.on("uncaughtException", (error) => {
+    console.error("❌ Error no capturado:", error);
+    logErrorToFile(error);
+});
+
+process.on("unhandledRejection", (error) => {
+    console.error("❌ Promesa rechazada sin capturar:", error);
+    logErrorToFile(error);
+});
+
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
