@@ -1,8 +1,8 @@
 const fs = require("fs");
-const path = require("path"); // 📌 Asegúrate de que solo esté aquí
+const path = require("path"); 
 
 function logErrorToFile(error) {
-    const logFilePath = path.join(__dirname, "../logs/error.log"); // 📌 Ahora `path` está definido antes de usarse
+    const logFilePath = path.join(__dirname, "../logs/error.log");
     const errorMessage = `${new Date().toISOString()} - ${error}\n`;
     fs.appendFileSync(logFilePath, errorMessage);
 }
@@ -14,7 +14,6 @@ process.on("uncaughtException", (error) => {
 
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const sql = require("mssql");
 require("dotenv").config();
 
@@ -70,15 +69,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Error interno en el servidor", details: err.message });
 });
 
-// Problemas globales
-process.on("uncaughtException", (err) => {
-    console.error("❌ Uncaught Exception:", err);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-    console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
-});
-
 // 📌 Agregar logs para depuración en Plesk
 console.log("🟢 Iniciando servidor...");
 
@@ -88,27 +78,26 @@ console.log(`🔹 DB_USER: ${process.env.DB_USER}`);
 console.log(`🔹 DB_SERVER: ${process.env.DB_SERVER}`);
 console.log(`🔹 PORT: ${process.env.PORT || "No definido"}`);
 
+// 📌 Iniciar el servidor en un puerto dinámico
 const PORT = process.env.PORT || 0;
-console.log(`🔍 Intentando iniciar en el puerto: ${PORT}`);
 
-// 📌 Iniciar el servidor correctamente SIN DUPLICADOS
-poolPromise
-    .then(() => {
-        console.log(`✅ Conexión a SQL Server establecida`);
-        
-        const server = app.listen(PORT, () => {
-            console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
-        });
+const server = app.listen(PORT, () => {
+    const assignedPort = server.address().port;
+    console.log(`🚀 Servidor corriendo en el puerto ${assignedPort}`);
+});
 
-        server.on("error", (err) => {
-            if (err.code === "EADDRINUSE") {
-                console.error(`❌ Error: El puerto ${PORT} ya está en uso.`);
-                process.exit(1);
-            } else {
-                console.error("❌ Error al iniciar el servidor:", err);
-            }
-        });
-    })
-    .catch(err => {
-        console.error("❌ No se pudo conectar a SQL Server, deteniendo el servidor:", err);
-    });
+// 📌 Manejo de errores en la conexión al servidor
+server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+        console.error(`❌ Error: El puerto ya está en uso.`);
+        process.exit(1);
+    } else {
+        console.error("❌ Error al iniciar el servidor:", err);
+    }
+});
+
+// 📌 Asegurar que el pool de la BD esté disponible antes de levantar el server
+poolPromise.catch(err => {
+    console.error("❌ No se pudo conectar a SQL Server, deteniendo el servidor:", err);
+    process.exit(1);
+});
