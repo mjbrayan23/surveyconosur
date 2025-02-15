@@ -82,9 +82,37 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 
+
+// 📌 Agregar logs para depuración en Plesk
+console.log("🟢 Iniciando servidor...");
+
+// 📄 Verifica si .env se carga correctamente
+console.log("📄 Variables de entorno cargadas:");
+console.log(`🔹 DB_USER: ${process.env.DB_USER}`);
+console.log(`🔹 DB_SERVER: ${process.env.DB_SERVER}`);
+console.log(`🔹 PORT: ${process.env.PORT || "No definido"}`);
+
+const PORT = process.env.PORT || 0;
+console.log(`🔍 Intentando iniciar en el puerto: ${PORT}`);
+
+// 📌 Mantener la estructura original, pero con logs de depuración
+poolPromise
+    .then(() => {
+        console.log(`✅ Conexión a SQL Server establecida`);
+        console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+        app.listen(PORT, () => {
+            console.log(`✅ Servidor en ejecución en: http://localhost:${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error("❌ No se pudo conectar a SQL Server:", err);
+    });
+
+
+
 // 📌 Iniciar el servidor
 // Definir el puerto (Usa el puerto que Plesk asigna)
-const PORT = process.env.PORT || 0; // Permitir que Plesk asigne el puerto dinámicamente
+
 poolPromise
     .then(() => {
         
