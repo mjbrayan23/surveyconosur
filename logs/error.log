@@ -1,0 +1,5 @@
+2025-02-15T00:05:27.697Z - Error: listen EADDRINUSE: address already in use :::3000
+2025-02-15T00:07:58.722Z - SyntaxError: Unexpected end of input
+2025-02-15T00:08:37.481Z - Error: listen EADDRINUSE: address already in use :::3000
+2025-02-15T00:12:58.906Z - Error: listen EADDRINUSE: address already in use :::3000
+2025-02-15T00:13:31.347Z - Error: listen EADDRINUSE: address already in use :::4000

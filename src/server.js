@@ -12,7 +12,6 @@ process.on("uncaughtException", (error) => {
     logErrorToFile(error);
 });
 
-
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -50,12 +49,11 @@ const poolPromise = new sql.ConnectionPool(config)
 
 module.exports = { sql, poolPromise };
 
-    // 📌 Middleware para registrar todas las solicitudes entrantes
+// 📌 Middleware para registrar todas las solicitudes entrantes
 app.use((req, res, next) => {
     console.log(`🔍 Nueva solicitud: ${req.method} ${req.url}`);
     next();
 });
-
 
 // 📌 Importar y usar rutas
 const routes = require("./routes");
@@ -72,7 +70,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Error interno en el servidor", details: err.message });
 });
 
-//Problemas globales
+// Problemas globales
 process.on("uncaughtException", (err) => {
     console.error("❌ Uncaught Exception:", err);
 });
@@ -80,8 +78,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason, promise) => {
     console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
 });
-
-
 
 // 📌 Agregar logs para depuración en Plesk
 console.log("🟢 Iniciando servidor...");
@@ -95,34 +91,24 @@ console.log(`🔹 PORT: ${process.env.PORT || "No definido"}`);
 const PORT = process.env.PORT || 0;
 console.log(`🔍 Intentando iniciar en el puerto: ${PORT}`);
 
-// 📌 Mantener la estructura original, pero con logs de depuración
+// 📌 Iniciar el servidor correctamente SIN DUPLICADOS
 poolPromise
     .then(() => {
         console.log(`✅ Conexión a SQL Server establecida`);
-        console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
-        app.listen(PORT, () => {
-            console.log(`✅ Servidor en ejecución en: http://localhost:${PORT}`);
-        });
-    })
-    .catch(err => {
-        console.error("❌ No se pudo conectar a SQL Server:", err);
-    });
-
-
-
-// 📌 Iniciar el servidor
-// Definir el puerto (Usa el puerto que Plesk asigna)
-
-poolPromise
-    .then(() => {
         
-        console.log(`🌍 Modo: ${process.env.NODE_ENV || "development"}`);
-        console.log(`🔍 Puerto asignado: ${PORT}`);
-        app.listen(PORT, () => {
+        const server = app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+        });
+
+        server.on("error", (err) => {
+            if (err.code === "EADDRINUSE") {
+                console.error(`❌ Error: El puerto ${PORT} ya está en uso.`);
+                process.exit(1);
+            } else {
+                console.error("❌ Error al iniciar el servidor:", err);
+            }
         });
     })
     .catch(err => {
         console.error("❌ No se pudo conectar a SQL Server, deteniendo el servidor:", err);
     });
-

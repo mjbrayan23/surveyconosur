@@ -42,45 +42,45 @@ router.post("/generar-links", async (req, res) => {
 
 // 📌 2️⃣ Obtener todos los enlaces de encuesta generados
 
-router.get("/obtener-links", async (req, res) => {
-    try {
-        console.log("📡 Endpoint /api/obtener-links llamado");
-        
-        const pool = await poolPromise;
-        console.log("✅ Conexión a la BD establecida");
-
-        const result = await pool.request().query("SELECT * FROM Encuestas_Clientes");
-        
-        console.log("📄 Datos obtenidos:", result.recordset);
-        
-        res.json(result.recordset);
-    } catch (error) {
-        console.error("🔥 Error en /obtener-links:", error);
-        res.status(500).json({ error: "Error interno del servidor", detalles: error.message });
-    }
-});
-
-// router.get("/obtener-links", async (req, res) => {
+//router.get("/obtener-links", async (req, res) => {
 //     try {
+//         console.log("📡 Endpoint /api/obtener-links llamado");
+        
 //         const pool = await poolPromise;
-//         const result = await pool.request().query("SELECT id_cliente, token, respondida FROM Encuestas_Clientes");
+//         console.log("✅ Conexión a la BD establecida");
 
-//         if (result.recordset.length === 0) {
-//             return res.status(404).json({ error: "No hay enlaces generados." });
-//         }
-
-//         const enlaces = result.recordset.map(row => ({
-//             id_cliente: row.id_cliente,
-//             respondida: row.respondida,
-//             enlace: `http://localhost:3000/encuesta?token=${row.token}`
-//         }));
-
-//         res.json({ total: enlaces.length, enlaces });
+//         const result = await pool.request().query("SELECT * FROM Encuestas_Clientes");
+        
+//         console.log("📄 Datos obtenidos:", result.recordset);
+        
+//         res.json(result.recordset);
 //     } catch (error) {
-//         console.error("❌ Error obteniendo enlaces:", error);
-//         res.status(500).json({ error: "Error obteniendo los enlaces" });
+//         console.error("🔥 Error en /obtener-links:", error);
+//         res.status(500).json({ error: "Error interno del servidor", detalles: error.message });
 //     }
 // });
+
+router.get("/obtener-links", async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request().query("SELECT id_cliente, token, respondida FROM Encuestas_Clientes");
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: "No hay enlaces generados." });
+        }
+
+        const enlaces = result.recordset.map(row => ({
+            id_cliente: row.id_cliente,
+            respondida: row.respondida,
+            enlace: `http://localhost:3000/encuesta?token=${row.token}`
+        }));
+
+        res.json({ total: enlaces.length, enlaces });
+    } catch (error) {
+        console.error("❌ Error obteniendo enlaces:", error);
+        res.status(500).json({ error: "Error obteniendo los enlaces" });
+    }
+});
 
 // 📌 3️⃣ Validar token antes de cargar la encuesta
 router.get("/validar-token", async (req, res) => {
